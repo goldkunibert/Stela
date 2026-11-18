@@ -122,8 +122,9 @@ pub enum Command {
         #[arg(long)]
         diagnostics: bool,
         /// Carry amdgpu beside nouveau and the image's Mesa drivers, for a
-        /// Radeon RX 9070 (Navi 48) or RX 6800-6950 XT (Navi 21): amdgpu
-        /// binds it in the Linux environment.
+        /// Radeon RX 9070 (Navi 48), RX 6800-6950 XT (Navi 21) or RX 6400 or
+        /// 6500 XT (Navi 24, not yet checked on hardware): amdgpu binds it in
+        /// the Linux environment.
         #[arg(long, conflicts_with = "radv")]
         amdgpu: bool,
         /// Carry amdgpu and require RADV among the image's Mesa drivers:
@@ -524,6 +525,15 @@ pub fn run(command: Command) -> Result<ExitCode> {
 pub fn build(release: bool) -> Result<PathBuf> {
     crate::gpu::build_nvk(crate::gpu::default_jobs())?;
     build_with_diagnostics(release, false, Gpu::Nvk)
+}
+
+/// The image `cargo xtask dist --radv` ships: amdgpu with RADV, ACO and NIR
+/// among the Mesa drivers, beside NVK. Stops when the build host built no
+/// RADV, as `boot build --radv` does.
+pub fn build_radv(release: bool) -> Result<PathBuf> {
+    crate::gpu::build_nvk(crate::gpu::default_jobs())?;
+    crate::gpu::require_vulkan_driver("amd")?;
+    build_with_diagnostics(release, false, Gpu::Radv)
 }
 
 /// The GPU drivers a `stela.efi` carries beyond its Linux environment.

@@ -20,12 +20,13 @@ fn the_complete_bundle_holds_every_recipe_once_by_content() {
     let (count, bytes) = size();
     assert_eq!(count, objects.len());
     // The RTL8168H and RTL8168M share a file, as the RTL9151A and RTL9151AS
-    // do, and, with the AMD port, amdgpu's `mec` and `mec2` of Raphael and
-    // of Navi 21.
+    // do, and, with the AMD port, amdgpu's `mec` and `mec2` of Raphael, of
+    // Navi 21 and of Navi 24, and the video decoder and DMCUB files Navi 24
+    // shares with Navi 21.
     if Ports::BUILT == Ports::ALL {
-        assert_eq!(count + 4, recipes().count());
-        // The recipes' recorded lengths: 121 files, 184.9 MiB.
-        assert_eq!((count, bytes), (121, 193_887_456), "{count} {bytes}");
+        assert_eq!(count + 7, recipes().count());
+        // The recipes' recorded lengths: 130 files, 186.7 MiB.
+        assert_eq!((count, bytes), (130, 195_820_526), "{count} {bytes}");
     }
     if Ports::BUILT == Ports::NONE {
         assert_eq!(count + 2, recipes().count());
@@ -241,6 +242,27 @@ fn a_boot_selects_exactly_the_files_its_pci_functions_need() {
     );
     assert_eq!(found.len(), USB.len() + files.len() - 1);
     assert!(navi21.unknown.is_empty());
+    // An RX 6500 XT (Navi 24) and its audio function: its files, with `mec2`
+    // held once as `mec`'s bytes and the video decoder and DMCUB held once
+    // as Navi 21's.
+    let navi24 = select_for(
+        &[pci(0x1002, 0x743f, 0x03), pci(0x1002, 0xab28, 0x04)],
+        Ports::ALL,
+    );
+    let found = members(&navi24);
+    let files = family(0x743f);
+    assert_eq!(files.len(), 12);
+    assert!(
+        found
+            .iter()
+            .all(|member| USB.contains(member) || files.contains(member))
+    );
+    assert_eq!(found.len(), USB.len() + files.len() - 1);
+    assert!(navi24.unknown.is_empty());
+    // Every ID of amdgpu's Navi 24 entry takes the same files.
+    for device in [0x7420, 0x7421, 0x7422, 0x7423, 0x7424] {
+        assert_eq!(family(device), files);
+    }
     // An NVIDIA display chip no recipe covers is named once.
     let old = select(&[pci(0x10de, 0x1b80, 0x03), pci(0x10de, 0x1b80, 0x03)]);
     assert_eq!(old.unknown, ["pci 10de:1b80"]);

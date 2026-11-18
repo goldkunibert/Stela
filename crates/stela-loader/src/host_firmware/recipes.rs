@@ -1316,6 +1316,69 @@ pub const AMDGPU: &[Recipe] = &[
         114164,
         "286458c7911172734dd514631dcfba9690c2242f24f9be72afd6b56c0341974a",
     ),
+    amdgpu(
+        "amdgpu/beige_goby_ce.bin",
+        263296,
+        "13aecf0a22dbc3071ade01355b27a4f90a0f46fc699064ab63e08392e65bbeab",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_me.bin",
+        263424,
+        "a133027a81b728409ffcd38ca1d37b87c40f24d1d336697ff80b04ff36b6287c",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_mec.bin",
+        268160,
+        "387f8d2926c8b81cc87a6a200879ba334a373aa04f757d233c2af8b4a3b005fa",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_mec2.bin",
+        268160,
+        "387f8d2926c8b81cc87a6a200879ba334a373aa04f757d233c2af8b4a3b005fa",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_pfp.bin",
+        263424,
+        "3b655d0dea35ccbd1352414e64bc933f7ff4f84eda40b382681863fa35c20a85",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_rlc.bin",
+        130472,
+        "9208c221ef15175cd52c66c0473f603544e5cff2c2d00914dadd6913ef5f2c03",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_sdma.bin",
+        34048,
+        "61c4352b22f28f493ced87d1725fc2c3f985fb3889ae8da13da91bc507683f60",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_smc.bin",
+        244934,
+        "f3489486b8cbd2e4cb5298cd5fbc8a90f1d885e07f8bd356addafad0be5303d5",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_sos.bin",
+        205984,
+        "cdee142c0f33d9a3f956edf04019a11a4dd3a1c48eea6da91913fafa045857f0",
+    ),
+    amdgpu(
+        "amdgpu/beige_goby_ta.bin",
+        259328,
+        "744d1a60888e23af672ce13923dadfe21d35c122e64d4a0629f9bfc26eae832b",
+    ),
+    // Navi 24's video decoder, the same bytes as Navi 21's, which amdgpu asks
+    // for at start.
+    amdgpu(
+        "amdgpu/beige_goby_vcn.bin",
+        582800,
+        "2f3cbd54cc9fad35665c06079f61e175dae3dca34d971bfeb73e4ab3efd7bf65",
+    ),
+    // Navi 24's DMCUB (DCN 3.0.3), the same bytes as Navi 21's.
+    amdgpu(
+        "amdgpu/beige_goby_dmcub.bin",
+        114164,
+        "286458c7911172734dd514631dcfba9690c2242f24f9be72afd6b56c0341974a",
+    ),
 ];
 
 /// A GPU family's name, PCI device IDs and files.
@@ -1387,6 +1450,27 @@ const AMDGPU_FAMILIES: &[AmdgpuFamily] = &[
             "amdgpu/sienna_cichlid_ta.bin",
             "amdgpu/sienna_cichlid_vcn.bin",
             "amdgpu/sienna_cichlid_dmcub.bin",
+        ],
+    ),
+    (
+        "Radeon RX 6400, 6500 XT or PRO W6300/W6400/W6500 (Navi 24)",
+        // amdgpu's ID table lists these under CHIP_BEIGE_GOBY; 1002:743f is
+        // the RX 6500 XT. No board of this family has been checked on
+        // hardware yet.
+        &[0x7420, 0x7421, 0x7422, 0x7423, 0x7424, 0x743f],
+        &[
+            "amdgpu/beige_goby_ce.bin",
+            "amdgpu/beige_goby_me.bin",
+            "amdgpu/beige_goby_mec.bin",
+            "amdgpu/beige_goby_mec2.bin",
+            "amdgpu/beige_goby_pfp.bin",
+            "amdgpu/beige_goby_rlc.bin",
+            "amdgpu/beige_goby_sdma.bin",
+            "amdgpu/beige_goby_smc.bin",
+            "amdgpu/beige_goby_sos.bin",
+            "amdgpu/beige_goby_ta.bin",
+            "amdgpu/beige_goby_vcn.bin",
+            "amdgpu/beige_goby_dmcub.bin",
         ],
     ),
 ];
