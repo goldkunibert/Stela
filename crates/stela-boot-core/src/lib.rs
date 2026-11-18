@@ -49,6 +49,7 @@ pub mod gpu_loss;
 pub mod gpu_requests;
 pub mod gpu_status;
 pub mod guarded_stacks;
+pub mod guest_audio;
 pub mod guest_bluetooth;
 pub mod guest_screen;
 pub mod guest_session;

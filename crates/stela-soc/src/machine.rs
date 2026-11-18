@@ -21,6 +21,7 @@ use crate::Result;
 pub use crate::pmu::{RtcAnchor, RtcEpoch};
 use crate::usb::{
     Function, Speed,
+    audio::Audio,
     ecm::Ecm,
     hci::Hci,
     hid::Peripheral,
@@ -29,6 +30,7 @@ use crate::usb::{
     storage::MassStorage,
 };
 pub use crate::usb::{
+    audio::{Counters as UsbAudioCounters, Status as UsbAudioStatus},
     ecm::Counters as UsbNetworkCounters,
     hci::{Counters as UsbBluetoothCounters, Outbound, Traced as UsbBluetoothTrace},
     host::{Descriptor as UsbDescriptor, MuxEndpoints},
@@ -389,6 +391,10 @@ pub struct UsbCables {
     pub network: Option<Mac>,
     /// A USB Bluetooth controller.
     pub bluetooth: Option<UsbBluetooth>,
+    /// A USB audio speaker (USB Audio Class 2.0, stereo, 48 kHz) whose
+    /// frames the host takes with [`AppleDevices::audio_take`]. macOS binds
+    /// its own class driver to it.
+    pub audio: bool,
 }
 
 /// The USB Bluetooth controller on the native hub.
@@ -403,20 +409,21 @@ pub enum UsbBluetooth {
 
 impl UsbCables {
     /// The disks the hub has ports for beside the keyboard and pointer and,
-    /// with `network` and `bluetooth`, the Ethernet adapter and Bluetooth
-    /// controller.
-    pub const fn disk_ports(network: bool, bluetooth: bool) -> usize {
-        hub::MAX_PORTS - 1 - network as usize - bluetooth as usize
+    /// with `network`, `bluetooth` and `audio`, the Ethernet adapter,
+    /// Bluetooth controller and audio speaker.
+    pub const fn disk_ports(network: bool, bluetooth: bool, audio: bool) -> usize {
+        hub::MAX_PORTS - 1 - network as usize - bluetooth as usize - audio as usize
     }
 }
 
 /// The functions on the native hub's ports: the keyboard and pointer on
-/// port 1, then the Ethernet adapter and Bluetooth controller when there are
-/// any, then one mass storage device per host disk.
+/// port 1, then the Ethernet adapter, Bluetooth controller and audio speaker
+/// when there are any, then one mass storage device per host disk.
 struct Attachments {
     input: Peripheral,
     network: Option<Ecm>,
     bluetooth: Option<Hci>,
+    audio: Option<Audio>,
     disks: Vec<MassStorage>,
 }
 
@@ -424,6 +431,7 @@ impl hub::Ports for Attachments {
     fn count(&self) -> usize {
         1 + usize::from(self.network.is_some())
             + usize::from(self.bluetooth.is_some())
+            + usize::from(self.audio.is_some())
             + self.disks.len()
     }
     fn speed(&self, port: usize) -> Speed {
@@ -433,16 +441,26 @@ impl hub::Ports for Attachments {
         let input = core::iter::once(&mut self.input as &mut dyn Function);
         let network = self.network.iter_mut().map(|f| f as &mut dyn Function);
         let bluetooth = self.bluetooth.iter_mut().map(|f| f as &mut dyn Function);
+        let audio = self.audio.iter_mut().map(|f| f as &mut dyn Function);
         let disks = self.disks.iter_mut().map(|f| f as &mut dyn Function);
-        let mut functions = input.chain(network).chain(bluetooth).chain(disks);
+        let mut functions = input
+            .chain(network)
+            .chain(bluetooth)
+            .chain(audio)
+            .chain(disks);
         functions.nth(port).expect("a port of the hub's count")
     }
     fn function_ref(&self, port: usize) -> &dyn Function {
         let input = core::iter::once(&self.input as &dyn Function);
         let network = self.network.iter().map(|f| f as &dyn Function);
         let bluetooth = self.bluetooth.iter().map(|f| f as &dyn Function);
+        let audio = self.audio.iter().map(|f| f as &dyn Function);
         let disks = self.disks.iter().map(|f| f as &dyn Function);
-        let mut functions = input.chain(network).chain(bluetooth).chain(disks);
+        let mut functions = input
+            .chain(network)
+            .chain(bluetooth)
+            .chain(audio)
+            .chain(disks);
         functions.nth(port).expect("a port of the hub's count")
     }
 }

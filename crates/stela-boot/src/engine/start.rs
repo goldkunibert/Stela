@@ -1781,6 +1781,7 @@ fn place_devices(
                 disks: placement.usb_disks,
                 network: placement.guest_mac,
                 bluetooth: placement.guest_bluetooth,
+                audio: options.guest_audio,
             },
             scanout,
             firmware: &firmware,
@@ -3075,7 +3076,11 @@ fn start_devices(
             let owned_wifi = wifi_network(handoff, options);
             let owned_writes = disk_writes(handoff);
             let external = options.external_disks.then(|| {
-                stela_soc::machine::UsbCables::disk_ports(options.guest_network, options.input)
+                stela_soc::machine::UsbCables::disk_ports(
+                    options.guest_network,
+                    options.input,
+                    options.guest_audio,
+                )
                     .saturating_sub(owned_usb.len())
             });
             let root = handoff.root;

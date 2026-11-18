@@ -151,6 +151,21 @@ fn maintenance_writes_require_an_explicit_preboot_selection() {
 }
 
 #[test]
+fn the_guest_audio_option_round_trips_and_is_off_by_default() {
+    assert!(!System::parse("--system").unwrap().guest_audio);
+    let line = format!("--system --storage {DISK} --guest-network --guest-audio");
+    let options = round_trip(&line);
+    assert!(options.guest_audio && options.guest_network);
+    assert_eq!(options.to_string(), line);
+    // Off, it leaves no trace in the line.
+    assert!(
+        !round_trip(&format!("--system --storage {DISK}"))
+            .to_string()
+            .contains("audio")
+    );
+}
+
+#[test]
 fn setup_lines_parse_and_serialize_identically() {
     let preboot = format!(
         "--system --storage {DISK} --nor {DISK} --preboot {DISK} --ecid 0x0000000000001234 \

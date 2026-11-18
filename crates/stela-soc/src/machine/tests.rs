@@ -4358,6 +4358,43 @@ fn a_gate_store_is_served_in_its_own_pes_step() {
     assert_eq!(*service.0.lock().unwrap(), [(1, 0x1234)]);
 }
 
+/// The native hub gives the audio speaker the port after the Bluetooth
+/// controller and before the disks, and the disks lose a port to it.
+#[test]
+fn the_hub_gives_the_audio_speaker_its_port_and_the_disks_lose_one() {
+    use crate::usb::control::{
+        GET_DESCRIPTOR,
+        tests::{setup, transfer},
+    };
+    let device = |function: &mut dyn Function| {
+        transfer(function, setup(0x80, GET_DESCRIPTOR, 0x100, 0, 18), &[]).unwrap()
+    };
+    let expected = device(&mut Audio::new());
+
+    let mut ports = Attachments {
+        input: Peripheral::new(),
+        network: None,
+        bluetooth: Some(Hci::new()),
+        audio: Some(Audio::new()),
+        disks: Vec::new(),
+    };
+    assert_eq!(hub::Ports::count(&ports), 3);
+    assert_eq!(device(hub::Ports::function(&mut ports, 2)), expected);
+    assert_ne!(device(hub::Ports::function(&mut ports, 1)), expected);
+    assert_ne!(device(hub::Ports::function(&mut ports, 0)), expected);
+    // A speaker is a high-speed function, as every port past the first.
+    assert_eq!(hub::Ports::speed(&ports, 2), Speed::High);
+
+    ports.audio = None;
+    assert_eq!(hub::Ports::count(&ports), 2);
+
+    // Each of network, Bluetooth and audio takes one of the seven ports.
+    assert_eq!(UsbCables::disk_ports(false, false, false), 6);
+    assert_eq!(UsbCables::disk_ports(true, false, false), 5);
+    assert_eq!(UsbCables::disk_ports(false, false, true), 5);
+    assert_eq!(UsbCables::disk_ports(true, true, true), 3);
+}
+
 mod data_integration;
 mod passive;
 mod pc_sampler;

@@ -332,7 +332,8 @@ fn inputs(options: &[u8], mut volume: FileSystem) -> Result<Inputs> {
         || !system.usb_storage.is_empty()
         || system.input
         || system.install.is_some()
-        || system.guest_network;
+        || system.guest_network
+        || system.guest_audio;
     let storage = if host_devices {
         crate::status::begin("Finding the PCI devices Stela drives itself");
         let found = storage::discover()?;

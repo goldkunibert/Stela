@@ -38,6 +38,7 @@ mod extended;
 pub use extended::LinkClock;
 pub mod hdmi;
 mod lifecycle;
+mod live;
 mod unsolicited;
 pub use unsolicited::{JackNotificationId, UnsolicitedEvent, UnsolicitedResponse};
 pub mod pci;

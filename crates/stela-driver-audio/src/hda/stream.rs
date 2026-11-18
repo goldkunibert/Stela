@@ -104,7 +104,7 @@ pub(super) struct ConverterBinding {
 
 pub(super) struct Stream {
     id: StreamId,
-    direction: Direction,
+    pub(super) direction: Direction,
     pub(super) format: PcmFormat,
     frame_bytes: u32,
     payload_words: u16,

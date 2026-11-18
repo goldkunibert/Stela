@@ -8,6 +8,7 @@ use core::cell::{Cell, RefCell};
 mod composition;
 mod construction_failures;
 mod lifecycle;
+mod live_refill;
 mod realtek_owned_models;
 mod unsolicited_models;
 

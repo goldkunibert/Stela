@@ -321,6 +321,12 @@ pub struct System {
     /// Give the guest a USB Ethernet adapter bridged to a host network
     /// adapter of its own (`--guest-network`).
     pub guest_network: bool,
+    /// Give the guest a USB audio speaker (`--guest-audio`): macOS lists it
+    /// as an output and sends it sound. The engine does not yet play that
+    /// sound on a host audio output (`guest_audio::Pump` is that bridge,
+    /// without the engine's controller ownership), so the sound is dropped
+    /// at the speaker's ring.
+    pub guest_audio: bool,
     /// Join this Wi-Fi network for the mount's network (`--wifi SSID`). The
     /// line writes `%`, whitespace and control characters as `%XX`.
     pub ssid: Option<String>,
@@ -412,6 +418,7 @@ impl Default for System {
             usb4_approved: Vec::new(),
             external_disks: false,
             guest_network: false,
+            guest_audio: false,
             ssid: None,
             wifi_key: None,
             wifi_country: None,
@@ -829,6 +836,7 @@ impl fmt::Display for System {
         }
         line.flag(EXTERNAL_DISKS, self.external_disks)?;
         line.flag("--guest-network", self.guest_network)?;
+        line.flag("--guest-audio", self.guest_audio)?;
         line.value(WIFI, self.ssid.as_deref().map(Ssid))?;
         line.value(
             WIFI_KEY,

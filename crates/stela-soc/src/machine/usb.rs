@@ -152,14 +152,16 @@ impl AppleDevices {
     /// HPM reports the attach and the controller's host personality finds
     /// the hub on its USB2 port. The keyboard and pointer sit on the hub's
     /// first port, and `cables` names the USB Ethernet adapter, Bluetooth
-    /// controller and mass storage devices on the next ones.
+    /// controller, audio speaker and mass storage devices on the next ones.
     pub fn attach_input(&mut self, connector: u32, cables: UsbCables) -> Result<()> {
         let UsbCables {
             disks,
             network,
             bluetooth,
+            audio,
         } = cables;
-        let extras = usize::from(network.is_some()) + usize::from(bluetooth.is_some());
+        let extras =
+            usize::from(network.is_some()) + usize::from(bluetooth.is_some()) + usize::from(audio);
         if 1 + extras + disks.len() > hub::MAX_PORTS {
             return Err(refuse!("the native hub has seven ports"));
         }
@@ -182,6 +184,7 @@ impl AppleDevices {
                 UsbBluetooth::Host => Hci::new(),
                 UsbBluetooth::Model => Hci::modeled(crate::usb::hci::model::address(self.ecid)),
             }),
+            audio: audio.then(Audio::new),
             disks,
         };
         master.peripheral = Some(Hub::new(attachments, "0001")?);
@@ -213,6 +216,43 @@ impl AppleDevices {
     pub fn network_deliver_owned(&mut self, frame: Vec<u8>) -> Result<()> {
         self.usb_network()?.deliver_owned(frame);
         Ok(())
+    }
+
+    fn usb_audio(&mut self) -> Option<&mut Audio> {
+        self.usb_masters
+            .iter_mut()
+            .find_map(|master| master.peripheral.as_mut()?.ports.audio.as_mut())
+    }
+
+    /// Whether the guest has the USB audio speaker's streaming setting
+    /// selected; false without a speaker.
+    pub fn audio_streaming(&mut self) -> bool {
+        self.usb_audio().is_some_and(|audio| audio.streaming())
+    }
+
+    /// Frames from the guest waiting for the host, 48 kHz stereo; zero
+    /// without a speaker.
+    pub fn audio_queued(&mut self) -> usize {
+        self.usb_audio().map_or(0, |audio| audio.queued())
+    }
+
+    /// Moves up to `out.len()` stereo frames from the guest's speaker to
+    /// `out`, 32-bit MSB-aligned with the guest's mute and volume applied;
+    /// the number moved.
+    pub fn audio_take(&mut self, out: &mut [[i32; crate::usb::audio::CHANNELS]]) -> usize {
+        self.usb_audio().map_or(0, |audio| audio.take(out))
+    }
+
+    /// Whether enough frames arrived that the host should play them soon;
+    /// cleared by asking.
+    pub fn audio_take_due(&mut self) -> bool {
+        self.usb_audio().is_some_and(|audio| audio.take_due())
+    }
+
+    /// The speaker's stream setting, mute, volume and counters; `None`
+    /// without a speaker.
+    pub fn audio_status(&mut self) -> Option<UsbAudioStatus> {
+        self.usb_audio().map(|audio| audio.status())
     }
 
     fn usb_bluetooth(&mut self) -> Option<&mut Hci> {
