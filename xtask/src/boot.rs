@@ -122,9 +122,10 @@ pub enum Command {
         #[arg(long)]
         diagnostics: bool,
         /// Carry amdgpu beside nouveau and the image's Mesa drivers, for a
-        /// Radeon RX 9070 (Navi 48), RX 6800-6950 XT (Navi 21) or RX 6400 or
-        /// 6500 XT (Navi 24, not yet checked on hardware): amdgpu binds it in
-        /// the Linux environment.
+        /// Radeon RX 9070 (Navi 48), RX 6800-6950 XT (Navi 21), RX 6700 XT or
+        /// 6750 XT (Navi 22) or RX 6400 or 6500 XT (Navi 24; Navi 22 and 24
+        /// not yet checked on hardware): amdgpu binds it in the Linux
+        /// environment.
         #[arg(long, conflicts_with = "radv")]
         amdgpu: bool,
         /// Carry amdgpu and require RADV among the image's Mesa drivers:

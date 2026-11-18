@@ -1379,6 +1379,69 @@ pub const AMDGPU: &[Recipe] = &[
         114164,
         "286458c7911172734dd514631dcfba9690c2242f24f9be72afd6b56c0341974a",
     ),
+    amdgpu(
+        "amdgpu/navy_flounder_ce.bin",
+        263296,
+        "6d62d58b9996135852e33610108906ba3c4f69026f20cfa4f455f0d50af23fca",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_me.bin",
+        263424,
+        "73c895203323ae1630b2b59688c6df2829499fd18543c3d2f3bfd94c861d4dd3",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_mec.bin",
+        268160,
+        "f615b304e42a1ffe30a3f78a4c4dbb1cc28ceaeaa2ca11b1ab3c425a9b03d9e6",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_mec2.bin",
+        268160,
+        "f615b304e42a1ffe30a3f78a4c4dbb1cc28ceaeaa2ca11b1ab3c425a9b03d9e6",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_pfp.bin",
+        263424,
+        "549cb69a1e270bdb0355271f47b4e3f466fca6c64dd300ba3d4ae4dbb9036108",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_rlc.bin",
+        137336,
+        "5a016db2f7c7a00b2e6d09d824dd6d2422d8df74a40a5fe0ee523804008e5284",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_sdma.bin",
+        34048,
+        "232a6016e81e62559411de2fcd8532587da3474dd7b480fd8fc09e0db93f6b5d",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_smc.bin",
+        244902,
+        "8c9642ce854447f6ec453b1679e34b6c961cd481eaf01f9295d25710b88bdc78",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_sos.bin",
+        218608,
+        "bdb7342c92b218dc56ffcfb8cbc06d6f3e1e8eedfe7f4ae27393c42247f34751",
+    ),
+    amdgpu(
+        "amdgpu/navy_flounder_ta.bin",
+        259328,
+        "744d1a60888e23af672ce13923dadfe21d35c122e64d4a0629f9bfc26eae832b",
+    ),
+    // Navi 22's video decoder, the same bytes as Navi 21's, which amdgpu asks
+    // for at start.
+    amdgpu(
+        "amdgpu/navy_flounder_vcn.bin",
+        582800,
+        "2f3cbd54cc9fad35665c06079f61e175dae3dca34d971bfeb73e4ab3efd7bf65",
+    ),
+    // Navi 22's DMCUB (DCN 3.0.2), the same bytes as Navi 21's.
+    amdgpu(
+        "amdgpu/navy_flounder_dmcub.bin",
+        114164,
+        "286458c7911172734dd514631dcfba9690c2242f24f9be72afd6b56c0341974a",
+    ),
 ];
 
 /// A GPU family's name, PCI device IDs and files.
@@ -1471,6 +1534,29 @@ const AMDGPU_FAMILIES: &[AmdgpuFamily] = &[
             "amdgpu/beige_goby_ta.bin",
             "amdgpu/beige_goby_vcn.bin",
             "amdgpu/beige_goby_dmcub.bin",
+        ],
+    ),
+    (
+        "Radeon RX 6700 XT, 6750 XT or PRO W6800 (Navi 22)",
+        // amdgpu's ID table lists these under CHIP_NAVY_FLOUNDER; 1002:73df is
+        // the RX 6700 XT and 6750 XT. No board of this family has been
+        // checked on hardware yet.
+        &[
+            0x73c0, 0x73c1, 0x73c3, 0x73da, 0x73db, 0x73dc, 0x73dd, 0x73de, 0x73df,
+        ],
+        &[
+            "amdgpu/navy_flounder_ce.bin",
+            "amdgpu/navy_flounder_me.bin",
+            "amdgpu/navy_flounder_mec.bin",
+            "amdgpu/navy_flounder_mec2.bin",
+            "amdgpu/navy_flounder_pfp.bin",
+            "amdgpu/navy_flounder_rlc.bin",
+            "amdgpu/navy_flounder_sdma.bin",
+            "amdgpu/navy_flounder_smc.bin",
+            "amdgpu/navy_flounder_sos.bin",
+            "amdgpu/navy_flounder_ta.bin",
+            "amdgpu/navy_flounder_vcn.bin",
+            "amdgpu/navy_flounder_dmcub.bin",
         ],
     ),
 ];

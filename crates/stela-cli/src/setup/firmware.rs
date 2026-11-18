@@ -1039,7 +1039,7 @@ mod tests {
         assert!(parsed.missing().is_empty());
         // A stick for an image with the AMD port also holds its firmware.
         let (objects, summary) = if cfg!(feature = "amdgpu-port") {
-            (130, "for every supported device (186.7 MiB)")
+            (138, "for every supported device (188.4 MiB)")
         } else {
             (88, "for every supported device (177.0 MiB)")
         };
@@ -1330,7 +1330,7 @@ mod tests {
         assert_eq!(
             status,
             if cfg!(feature = "amdgpu-port") {
-                "the firmware on the stick is incomplete: 3 of 130 files are there"
+                "the firmware on the stick is incomplete: 3 of 138 files are there"
             } else {
                 "the firmware on the stick is incomplete: 3 of 88 files are there"
             }
@@ -1356,7 +1356,7 @@ mod tests {
         .unwrap();
         let status = bundle_status(dir.path()).unwrap_err();
         let lacks = if cfg!(feature = "amdgpu-port") {
-            "lacks 129 of 130 files"
+            "lacks 137 of 138 files"
         } else {
             "lacks 87 of 88 files"
         };
